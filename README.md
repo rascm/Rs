@@ -116,3 +116,51 @@ This function runs when a player reaches the castle age. The function parameters
 **void RsImperialAge(int playerId, int civilization)**
 
 This function runs when a player reaches the imperial age. The function parameters are the same as those of ***RsFeudalAge***
+
+### Functions
+**void rsTechCheckerSetAll(int technologyId)**
+
+Adds a technology to the tracker for all players.
+
+- technologyId (required): Technology ID whose status must be monitored
+
+
+**void  rsTechCheckerSetFor(int player, int technologyId)**
+
+Adds a technology to the tracker for a specified player.
+
+- player (required): The player ID
+- technologyId (required): Technology ID whose status must be monitored
+
+
+**void rsTechCheckerRemoveAll(int technologyId)**
+
+Removes the technology from the monitor for all players.
+
+- technologyId (required): Technology ID
+
+
+**void rsTechCheckerRemoveFor(int player, int technologyId)**
+
+Removes the technology from the monitor for specified player.
+
+- player (required): The player ID
+- technologyId (required): Technology ID
+
+
+**int rsTechCheckerGetFrom(int player, int technologyId)**
+
+Get the status of a given technology from a specified player. Returns technology state ID.
+
+- player (required): The player ID
+- technologyId (required): Technology ID
+
+
+
+**int rsTechCheckerGetAll(int technologyId)**
+
+Get the status of a given technology from all players. Returns technology state ID in array.
+
+- technologyId (required): Technology ID
+
+

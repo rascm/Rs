@@ -1,11 +1,18 @@
+int delay = 100;
+int tick = 0;
+
 rule ___RS_RULE_EVENT_LISTENER___
     inactive
     group rsTechEvent
     highFrequency
     priority 1
 {
-    ___RS_API_TIMER_INSPECTOR___();
-    ___RS_API_TECH_CHECKER_INSPECTOR___();
+    int time = xsGetWorldTime();
+    if(tick < time) {
+        tick = xsGetWorldTime() + delay;
+        ___RS_API_TIMER_INSPECTOR___();
+        ___RS_API_TECH_CHECKER_INSPECTOR___();
+    }
 }
 
 mutable void RsReady() {}

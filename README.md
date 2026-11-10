@@ -20,7 +20,7 @@ void RsPlayer(int playerId = -1, int civilization = -1, string currentAge = "") 
 ```
 
 # Timer API
-
+### Events
 **void RsEventTimer(string eventName, string timerId, int expiresIn, int params)**
 
 This runs when you add a timer, when a timer expires, or when you remove a timer
@@ -29,20 +29,20 @@ This runs when you add a timer, when a timer expires, or when you remove a timer
 - timerId: The name of the timer.
 - params: This can be an integer or an array
 
-### Events
+
 **void RsEventTimerCreated(string timerId, int expiresIn, int params)**
 
-It runs when a timer is created by a function. It returns the same parameters as ***RsEventTimer***
+It runs when a timer is created by a function. The function parameters are the same as those of ***RsEventTimer***
 
 
 **void RsEventTimerExpired(string timerId, int expiresIn, int params)**
 
-It runs when a timer is expired. It returns the same parameters as ***RsEventTimer***
+It runs when a timer is expired. The function parameters are the same as those of ***RsEventTimer***
 
 
 **void RsEventTimerRemoved(string timerId, int expiresIn, int params)**
 
-It runs when a timer is removed by a function. It returns the same parameters as ***RsEventTimer***
+It runs when a timer is removed by a function. The function parameters are the same as those of ***RsEventTimer***
 
 ### Functions
 **string rsTimerCreate(string timerId, int duration, int params)**
@@ -55,7 +55,64 @@ Creating a Timer. returns a specified unique timer id
 
 
 **bool rsTimerRemove(string timerId)**
+
 Removing a timer before it expires
 
 - timerId (required): The existing timer unique ID.
 
+# Technology Check API
+### Events
+
+**void RsEventTechState(string eventName, int playerId, int techId, bool fromQueue)**
+This function runs every time the state of a particular technology changes.
+
+- eventName: The name of the event. Possible values: notready, ready, queued, inprogress, completed, disabled
+- playerId: The player ID of the player whose technology state has changed.
+- techId: Technology ID
+- fromQueue: It is true if was queued before the change in status
+
+**void RsEventTechStateNotReady(int playerId, int techId, bool fromQueue)**
+
+This function runs when the technology unavailable. The function parameters are the same as those of ***RsEventTechState***
+
+
+**void RsEventTechStateReady(int playerId, int techId, bool fromQueue)**
+
+This function runs when a technology is ready for research. The function parameters are the same as those of ***RsEventTechState***
+
+
+**void RsEventTechStateQueued(int playerId, int techId, bool fromQueue)**
+
+This function runs when a technology is in the queue. The function parameters are the same as those of ***RsEventTechState***
+
+
+**void RsEventTechStateInProgress(int playerId, int techId, bool fromQueue)**
+
+This function runs when a technology is being researched. The function parameters are the same as those of ***RsEventTechState***
+
+
+**void RsEventTechStateCompleted(int playerId, int techId, bool fromQueue)**
+
+This function runs when a technology has been successfully researched. The function parameters are the same as those of ***RsEventTechState***
+
+
+**void RsEventTechStateDisabled(int playerId, int techId, bool fromQueue)**
+
+This function runs when a technology has been disabled. The function parameters are the same as those of ***RsEventTechState***
+
+
+**void RsFeudalAge(int playerId, int civilization)**
+
+This function runs when a player reaches the feudal age.
+
+- playerId: The player ID
+- civilization: The player civilization ID
+
+**void RsCastleAge(int playerId, int civilization)**
+
+This function runs when a player reaches the castle age. The function parameters are the same as those of ***RsFeudalAge***
+
+
+**void RsImperialAge(int playerId, int civilization)**
+
+This function runs when a player reaches the imperial age. The function parameters are the same as those of ***RsFeudalAge***

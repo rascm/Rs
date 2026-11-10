@@ -1,166 +1,246 @@
-# Rs
-If I did something wrong, please let me know!
+# RS
 
-# What is this?
-This is an XS Script library that you can use in custom scenario! You need download the “Rs.xs” file, copy it into the your mod xs folder, and then load it into the file you're using in your own scenario! This library includes a technology status monitor, a timer, and other functions that simplify existing functions!
+Ha valami hibát találsz, kérlek jelezd ezt nekem!
 
-# A sample file
-The code below is a main XS file for a scenario:
+## Mi ez?
+
+Ez csak egy XS Script könyvtár Age Of Empires 2 játékhoz amit a saját scenariodban használhatsz! A könyvtár segítségével kevesebb kapcsolót kell használnod a szerkesztőben!
+
+**Problémák amiket nem lehet megoldani:**
+
+Jelenleg egy kritikus feladatot nem lehet megoldani, mégpedig technológiák esetében erőforrás mennyiséget változtatni vagy új erőforrástípust hozzáadni, jelenlegit felülírni XS Scripttel! Ezt sajnos kapcsolókkal és effektekkel kell megoldani! Íme egy példa ami jelenleg nem működik:
+
+```javascript
+int tech = 1180; // Blank Technology 00
+int targetPlayer = 1;
+
+// Az első szükséges erőforrás, az étel beállítása
+xsEffectAmount(cModifyTech, tech, cAttrTypeFirstCost, cAttributeFood, targetPlayer);
+// Az első szükséges erőforrás értéke, azaz mennyi élelem szükséges
+xsEffectAmount(cModifyTech, tech, cAttrAmountFirstCost, 50, targetPlayer);
+// Be kell állítani hogy levonja a költséget
+xsEffectAmount(cModifyTech, tech, cAttrDeductFlagFirstCost, 1, targetPlayer);
 
 ```
-include "Rs.xs";
 
-void RsReady() {
-// The code here provides the same functionality as if you were using the main() function!
-}
+Nem lehet felülírni az adott technológia árát! Talán a közeljövőben kijavítják ezt a hibát!
 
-void RsPlayer(int playerId = -1, int civilization = -1, string currentAge = "") {
-  // Place the codes that apply to a specific player! here This code runs only when the game starts a total of as many times as there are players!
-}
-```
+**Problémák amit nem lehet minden esetben megoldani vagy csak részmegoldás lehetséges:**
 
-# Timer API
-### Events
-**void RsEventTimer(string eventName, string timerId, int expiresIn, int params)**
+Jelenleg nem lehet olyan funkciót, sem változót létrehozni aminek bármilyen értéke lehet. Sajnos nem létezik olyan hogy "any". Továbbá nem lehet "korlátlan" számú opcionális paramétereket megadni, nem létezik funkción belül egy dedikált "arguments" változó sem az úgynevezett "spread syntax" mint javascriptben.
 
-This runs when you add a timer, when a timer expires, or when you remove a timer
+# Beépített API-k
 
-- eventName: The name of the event. Possible values: created, reemoved, expired
-- timerId: The name of the timer.
-- params: This can be an integer or an array
+## Timer API
 
+Létre tudsz hozni időzítőket, olyat mint ami a scenario editorban rendelkezésre áll.
 
-**void RsEventTimerCreated(string timerId, int expiresIn, int params)**
+### Funkciók
 
-It runs when a timer is created by a function. The function parameters are the same as those of ***RsEventTimer***
+**_string rsTimerCreate(string timerId, int duration, int params)_**
 
+Időzítő létrehozása. Visszatérő érték: Az időzítő egyedi azonosítója.
 
-**void RsEventTimerExpired(string timerId, int expiresIn, int params)**
+*   timerId (kötelező): Az időzítőd egyedi azonosítója. Nem egyezhet egy folyamatban lévő időzítőével
+    
+*   duration (kötelező): Hány másodperc múlva járjon le az időzítő.
+    
+*   params (opcionális): Egész szám vagy tömb lehet értékként
+    
 
-It runs when a timer is expired. The function parameters are the same as those of ***RsEventTimer***
+**_bool rsTimerRemove(string timerId)_**
 
+Folyamatban lévő időzítő eltávolítása. Igaz értéket ad vissza ha sikerült az eltávolítás.
 
-**void RsEventTimerRemoved(string timerId, int expiresIn, int params)**
+*   timerId (kötelező): A már létező időzítő egyedi azonosítója.
+    
 
-It runs when a timer is removed by a function. The function parameters are the same as those of ***RsEventTimer***
+### Esemény funkciók
 
-### Functions
-**string rsTimerCreate(string timerId, int duration, int params)**
+**_void RsEventTimer(string eventName, string timerId, int expiresIn, int params)_**
 
-Creating a Timer. returns a specified unique timer id
+Minden esetben lefut, legyen az létrehozás, törlés, vagy ha egy időzítő lejárt.
 
-- timerId (required): The timer unique ID.
-- duration (required): expiration time specified in seconds
-- params (optional): This can be an integer or an array
+*   eventName: Esemény neve. Lehetséges értékek: created, removed, expired
+    
+*   timerId: Az időzítő azonosítója
+    
+*   expiresIn: A lejárati időbélyeg
+    
+*   params: Ha van, egész szám vagy tömb az érték. Alapértelmezetten -1
+    
 
+**_void RsEventTimerCreated(string timerId, int expiresIn, int params)_**
 
-**bool rsTimerRemove(string timerId)**
+Akkor fut le ha egy időzítő létre lett hozva. A paraméterek megegyeznek a RsEventTimer paramétereivel.
 
-Removing a timer before it expires
+**_void RsEventTimerExpired(string timerId, int expiresIn, int params)_**
 
-- timerId (required): The existing timer unique ID.
+Akkor fut le ha egy időzítő lejárt. A paraméterek megegyeznek a RsEventTimer paramétereivel.
 
-# Technology Check API
-### Events
+**_void RsEventTimerRemoved(string timerId, int expiresIn, int params)_**
 
-**void RsEventTechState(string eventName, int playerId, int techId, bool fromQueue)**
-This function runs every time the state of a particular technology changes.
+Akkor fut le ha egy időzítő a lejárati ideje előtt el lett távolítva. A paraméterek megegyeznek a RsEventTimer paramétereivel.
 
-- eventName: The name of the event. Possible values: notready, ready, queued, inprogress, completed, disabled
-- playerId: The player ID of the player whose technology state has changed.
-- techId: Technology ID
-- fromQueue: It is true if was queued before the change in status
+## Technology Checker API
 
-**void RsEventTechStateNotReady(int playerId, int techId, bool fromQueue)**
+A megadott technológiákat hozzáadhatsz vagy eltávolíthatsz a figyelőhöz akár az összes vagy megadott játékosok számára.
 
-This function runs when the technology unavailable. The function parameters are the same as those of ***RsEventTechState***
+### Funkciók
 
+**_bool rsTechCheckerSetFor(int player, int technologyId)_**
 
-**void RsEventTechStateReady(int playerId, int techId, bool fromQueue)**
+A figyelőhöz hozzáad egy technológát a kiválasztott játékos számára. Igaz értéket ad vissza ha sikerült.
 
-This function runs when a technology is ready for research. The function parameters are the same as those of ***RsEventTechState***
+*   playerId: A kívánt játékos sorszáma (1-8)
+    
+*   technologyId: A figyelni kívánt technológia azonosítója. Például a 45-ös azonosítóval a Hit technológia állapotát figyelheted
+    
 
+**_void rsTechCheckerSetFor(int player, int technologyId)_**
 
-**void RsEventTechStateQueued(int playerId, int techId, bool fromQueue)**
+A figyelőhöz hozzáad egy technológát az összes játékos számára.
 
-This function runs when a technology is in the queue. The function parameters are the same as those of ***RsEventTechState***
+*   technologyId: A figyelni kívánt technológia azonosítója. Például a 45-ös azonosítóval a Hit technológia állapotát figyelheted
+    
 
+**_bool rsTechCheckerRemoveFor(int player, int technologyId)_**
 
-**void RsEventTechStateInProgress(int playerId, int techId, bool fromQueue)**
+Eltávolítja a figyelőből a technológiát a megadott játékos esetében. Igaz értéket ad vissza ha sikerült.
 
-This function runs when a technology is being researched. The function parameters are the same as those of ***RsEventTechState***
+*   player: A kívánt játékos sorszáma (1-8)
+    
+*   technologyId: Az eltávolítandó technológia azonosítója
+    
 
+**_void rsTechCheckerRemoveAll(int technologyId)_**
 
-**void RsEventTechStateCompleted(int playerId, int techId, bool fromQueue)**
+Eltávolítja a technológiát a figyelőből. Az összes játékosra érvényes!
 
-This function runs when a technology has been successfully researched. The function parameters are the same as those of ***RsEventTechState***
+*   technologyId: Az eltávolítandó technológia azonosítója
+    
 
+**_int rsTechCheckerGetFrom(int player, int technologyId)_**
 
-**void RsEventTechStateDisabled(int playerId, int techId, bool fromQueue)**
+Lekéri a megadott technológia tárolt állapotát a megadott játékos szerint. Egész számot ad vissza, megegyezik a technológia állapot konstansával. ([tech state konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/#17-tech-state)). nem létező technológia esetében RS\_FALSE
 
-This function runs when a technology has been disabled. The function parameters are the same as those of ***RsEventTechState***
+*   player: A kívánt játékos sorszáma (1-8)
+    
+*   technologyId: A technológia azonosítója aminek az állapotát le szeretnéd kérni
+    
 
+**_int rsTechCheckerGetAll(int technologyId)_**
 
-**void RsFeudalAge(int playerId, int civilization)**
+Lekéri a megadott technológia állapotát az összes felhasználótól. Visszatérési értéke egész számokat vagy RS\_FALSE értéket tartalmazó tömb (1-8 darabig terjedő).
 
-This function runs when a player reaches the feudal age.
+*   technologyId: A technológia azonosítója aminek az állapotát le szeretnéd kérni
+    
 
-- playerId: The player ID
-- civilization: The player civilization ID
+### Esemény funkciók
 
-**void RsCastleAge(int playerId, int civilization)**
+**_void RsEventTechState(string eventName, int playerId, int techId, bool fromQueue)_**
 
-This function runs when a player reaches the castle age. The function parameters are the same as those of ***RsFeudalAge***
+Minden esetben lefut ha technológia állapot változás történik.
 
+*   eventName: Az esemén. Lehetséges értékek: notready, ready, queued, inprogress, completed, disabled
+    
+*   playerId: A játékos azonosítója akinél változott az állapot
+    
+*   techId: A technológia azonosítója amelynek megváltozott az állapota
+    
+*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+    
 
-**void RsImperialAge(int playerId, int civilization)**
+**_void RsEventTechStateNotReady(int playerId, int techId, bool fromQueue)_**
 
-This function runs when a player reaches the imperial age. The function parameters are the same as those of ***RsFeudalAge***
+Akkor fut le ha egy technológia nem kutatható mert egy szükséges technológia hiányzik vagy nem elérhető az adott korban.
 
-### Functions
-**void rsTechCheckerSetAll(int technologyId)**
+*   playerId: A játékos azonosítója akinél változott az állapot
+    
+*   techId: A technológia azonosítója amelynek megváltozott az állapota
+    
+*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+    
 
-Adds a technology to the tracker for all players.
+**_void RsEventTechStateReady(int playerId, int techId, bool fromQueue)_**
 
-- technologyId (required): Technology ID whose status must be monitored
+Akkor fut le ha egy technológia kutatható.
 
+*   playerId: A játékos azonosítója akinél változott az állapot
+    
+*   techId: A technológia azonosítója amelynek megváltozott az állapota
+    
+*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+    
 
-**void  rsTechCheckerSetFor(int player, int technologyId)**
+**_void RsEventTechStateQueued(int playerId, int techId, bool fromQueue)_**
 
-Adds a technology to the tracker for a specified player.
+Akkor fut le ha egy technológia sorban áll.
 
-- player (required): The player ID
-- technologyId (required): Technology ID whose status must be monitored
+*   playerId: A játékos azonosítója akinél változott az állapot
+    
+*   techId: A technológia azonosítója amelynek megváltozott az állapota
+    
+*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban. Jelen esetben mindig igaz
+    
 
+**_void RsEventTechStateInProgress(int playerId, int techId, bool fromQueue)_**
 
-**void rsTechCheckerRemoveAll(int technologyId)**
+Akkor fut le ha egy technológia kutatás alatt van.
 
-Removes the technology from the monitor for all players.
+*   playerId: A játékos azonosítója akinél változott az állapot
+    
+*   techId: A technológia azonosítója amelynek megváltozott az állapota
+    
+*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+    
 
-- technologyId (required): Technology ID
+**_void RsEventTechStateCompleted(int playerId, int techId, bool fromQueue)_**
 
+Akkor fut le ha egy technológia sikeresen kutatva lett.
 
-**void rsTechCheckerRemoveFor(int player, int technologyId)**
+*   playerId: A játékos azonosítója akinél változott az állapot
+    
+*   techId: A technológia azonosítója amelynek megváltozott az állapota
+    
+*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+    
 
-Removes the technology from the monitor for specified player.
+**_void RsEventTechStateDisabled(int playerId, int techId, bool fromQueue)_**
 
-- player (required): The player ID
-- technologyId (required): Technology ID
+Akkor fut le ha egy technológia le lett tiltva.
 
+*   playerId: A játékos azonosítója akinél változott az állapot
+    
+*   techId: A technológia azonosítója amelynek megváltozott az állapota
+    
+*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+    
 
-**int rsTechCheckerGetFrom(int player, int technologyId)**
+### Korok szerinti események
 
-Get the status of a given technology from a specified player. Returns technology state ID.
+**_void RsFeudalAge(int playerId, int civilization)_**
 
-- player (required): The player ID
-- technologyId (required): Technology ID
+Akkor fut le ha az adott játékos sikeresen belépett a feudális korba. Ez a függvény csak akkor fut le ha nem a Feudális, Kastély és Birodalmi kortól indult a játék.
 
+*   playerId: A játékos azonosítója
+    
+*   civilization: A játékos civilizációjának azonosítója. Megegyezik a [civilizáció konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs) értékeivel.
+    
 
+**_void RsCastleAge(int playerId, int civilization)_**
 
-**int rsTechCheckerGetAll(int technologyId)**
+Akkor fut le ha az adott játékos sikeresen belépett a kastély korba. Ez a függvény csak akkor fut le ha nem a Kastély vagy Birodalmi kortól indult a játék.
 
-Get the status of a given technology from all players. Returns technology state ID in array.
+*   playerId: A játékos azonosítója
+    
+*   civilization: A játékos civilizációjának azonosítója. Megegyezik a [civilizáció konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs) értékeivel.
+    
 
-- technologyId (required): Technology ID
+**_void RsImperialAge(int playerId, int civilization)_**
 
+Akkor fut le ha az adott játékos sikeresen belépett a Birodalmi korba. Ez a függvény csak akkor fut le ha nem a Birodalmi kortól indult a játék.
 
+*   playerId: A játékos azonosítója
+    
+*   civilization: A játékos civilizációjának azonosítója. Megegyezik a [civilizáció konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs) értékeivel.

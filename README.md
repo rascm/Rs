@@ -11,7 +11,7 @@ This is just an XS Script library for Age Of Empires 2 that you can use in your 
 
 Currently, one critical task cannot be solved: changing the amount of a resource required by a technology, adding a new resource type, or overwriting an existing resource type using XS Script! Unfortunately, this has to be handled using triggers and effects! Here is an example that currently does not work:
 
-```javascript
+```c
 int tech = 1180; // Blank Technology 00
 int targetPlayer = 1;
 
@@ -32,7 +32,7 @@ Currently, it is not possible to create a function or variable that can hold any
 
 # Sample main.xs file
 
-```
+```c
 include "Rs.xs"
 
 // This code runs once when everything is ready. It works just like the main() function

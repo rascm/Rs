@@ -332,7 +332,7 @@ Configures whether villagers need to drop off their resources! It works like the
 
 *   playerId (required): The identifier of the player for whom it is activated
     
-*   type (required): The worker group that does not need to drop off resources. Possible values: hunter, gold miner, stone miner, miner (gold and stone miners), shepherd, fisher, pearlel, forager, hunter, lumber
+*   type (required): The worker group that does not need to drop off resources. Possible values: hunter, gold miner, stone miner, miner (gold and stone miners), shepherd, fisher, pearler, forager, hunter, lumber
     
 *   instant (optional): Enables or disables the effect
     

@@ -1,5 +1,3 @@
-````
-[English version](https://www.conveythis.com/website-translator?url=https%3A%2F%2Fgithub.com%2Frascm%2FRs%2Ftree%2Fmain%3Ftab%3Dreadme-ov-file&to=en)
 
 # RS
 
@@ -364,4 +362,3 @@ The "false" value represented as an integer. Value: -9999999
 **_int RS\_TRUE_**
 
 The "true" value represented as an integer. Value: 9999999
-````

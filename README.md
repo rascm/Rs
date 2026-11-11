@@ -1,366 +1,367 @@
+````
 [English version](https://www.conveythis.com/website-translator?url=https%3A%2F%2Fgithub.com%2Frascm%2FRs%2Ftree%2Fmain%3Ftab%3Dreadme-ov-file&to=en)
-
 
 # RS
 
-Ha valami hibát találsz, kérlek jelezd ezt nekem!
+If you find any bugs, please let me know!
 
-## Mi ez?
+## What is this?
 
-Ez csak egy XS Script könyvtár Age Of Empires 2 játékhoz amit a saját scenariodban használhatsz! A könyvtár segítségével kevesebb kapcsolót kell használnod a szerkesztőben!
+This is just an XS Script library for Age Of Empires 2 that you can use in your own scenario! With this library, you need to use fewer triggers in the editor!
 
-**Problémák amiket nem lehet megoldani:**
+**Problems that cannot be solved:**
 
-Jelenleg egy kritikus feladatot nem lehet megoldani, mégpedig technológiák esetében erőforrás mennyiséget változtatni vagy új erőforrástípust hozzáadni, jelenlegit felülírni XS Scripttel! Ezt sajnos kapcsolókkal és effektekkel kell megoldani! Íme egy példa ami jelenleg nem működik:
+Currently, one critical task cannot be solved: changing the amount of a resource required by a technology, adding a new resource type, or overwriting an existing resource type using XS Script! Unfortunately, this has to be handled using triggers and effects! Here is an example that currently does not work:
 
 ```javascript
 int tech = 1180; // Blank Technology 00
 int targetPlayer = 1;
 
-// Az első szükséges erőforrás, az étel beállítása
+// Set the first required resource, food
 xsEffectAmount(cModifyTech, tech, cAttrTypeFirstCost, cAttributeFood, targetPlayer);
-// Az első szükséges erőforrás értéke, azaz mennyi élelem szükséges
+// Set the amount of the first required resource, i.e. how much food is required
 xsEffectAmount(cModifyTech, tech, cAttrAmountFirstCost, 50, targetPlayer);
-// Be kell állítani hogy levonja a költséget
+// It must be configured to deduct the cost
 xsEffectAmount(cModifyTech, tech, cAttrDeductFlagFirstCost, 1, targetPlayer);
 
 ```
 
-Nem lehet felülírni az adott technológia árát! Talán a közeljövőben kijavítják ezt a hibát!
+The cost of the specified technology cannot be overwritten! Perhaps this bug will be fixed in the near future!
 
-**Problémák amit nem lehet minden esetben megoldani vagy csak részmegoldás lehetséges:**
+**Problems that cannot be solved in every case, or for which only a partial solution is possible:**
 
-Jelenleg nem lehet olyan funkciót, sem változót létrehozni aminek bármilyen értéke lehet. Sajnos nem létezik olyan hogy "any". Továbbá nem lehet "korlátlan" számú opcionális paramétereket megadni, nem létezik funkción belül egy dedikált "arguments" változó sem az úgynevezett "spread syntax" mint javascriptben.
+Currently, it is not possible to create a function or variable that can hold any type of value. Unfortunately, there is no such type as "any". Furthermore, it is not possible to specify an "unlimited" number of optional parameters, nor is there a dedicated "arguments" variable within functions or so-called "spread syntax" like in JavaScript.
 
-# Beépített API-k
+# Built-in APIs
 
 ## Timer API
 
-Létre tudsz hozni időzítőket, olyat mint ami a scenario editorban rendelkezésre áll.
+You can create timers similar to those available in the Scenario Editor.
 
-### Funkciók
+### Functions
 
 **_string rsTimerCreate(string timerId, int duration, int params)_**
 
-Időzítő létrehozása. Visszatérő érték: Az időzítő egyedi azonosítója.
+Creates a timer. Return value: The unique identifier of the timer.
 
-*   timerId (kötelező): Az időzítőd egyedi azonosítója. Nem egyezhet egy folyamatban lévő időzítőével
+*   timerId (required): The unique identifier of your timer. It cannot be the same as that of a timer that is currently active.
     
-*   duration (kötelező): Hány másodperc múlva járjon le az időzítő.
+*   duration (required): The number of seconds until the timer expires.
     
-*   params (opcionális): Egész szám vagy tömb lehet értékként
+*   params (optional): The value can be an integer or an array.
     
 
 **_bool rsTimerRemove(string timerId)_**
 
-Folyamatban lévő időzítő eltávolítása. Igaz értéket ad vissza ha sikerült az eltávolítás.
+Removes an active timer. Returns true if the timer was successfully removed.
 
-*   timerId (kötelező): A már létező időzítő egyedi azonosítója.
+*   timerId (required): The unique identifier of an existing timer.
     
 
-### Esemény funkciók
+### Event Functions
 
 **_void RsEventTimer(string eventName, string timerId, int expiresIn, int params)_**
 
-Minden esetben lefut, legyen az létrehozás, törlés, vagy ha egy időzítő lejárt.
+Runs in every case, whether a timer is created, removed, or expires.
 
-*   eventName: Esemény neve. Lehetséges értékek: created, removed, expired
+*   eventName: The name of the event. Possible values: created, removed, expired
     
-*   timerId: Az időzítő azonosítója
+*   timerId: The identifier of the timer
     
-*   expiresIn: A lejárati időbélyeg
+*   expiresIn: The expiration timestamp
     
-*   params: Ha van, egész szám vagy tömb az érték. Alapértelmezetten -1
+*   params: If present, the value is an integer or an array. The default value is -1
     
 
 **_void RsEventTimerCreated(string timerId, int expiresIn, int params)_**
 
-Akkor fut le ha egy időzítő létre lett hozva. A paraméterek megegyeznek a RsEventTimer paramétereivel.
+Runs when a timer has been created. The parameters are the same as those of RsEventTimer.
 
 **_void RsEventTimerExpired(string timerId, int expiresIn, int params)_**
 
-Akkor fut le ha egy időzítő lejárt. A paraméterek megegyeznek a RsEventTimer paramétereivel.
+Runs when a timer expires. The parameters are the same as those of RsEventTimer.
 
 **_void RsEventTimerRemoved(string timerId, int expiresIn, int params)_**
 
-Akkor fut le ha egy időzítő a lejárati ideje előtt el lett távolítva. A paraméterek megegyeznek a RsEventTimer paramétereivel.
+Runs when a timer is removed before its expiration time. The parameters are the same as those of RsEventTimer.
 
 ## Technology Checker API
 
-A megadott technológiákat hozzáadhatsz vagy eltávolíthatsz a figyelőhöz akár az összes vagy megadott játékosok számára.
+You can add specified technologies to or remove them from the monitor for either all players or specific players.
 
-### Funkciók
+### Functions
 
 **_bool rsTechCheckerSetFor(int player, int technologyId)_**
 
-A figyelőhöz hozzáad egy technológát a kiválasztott játékos számára. Igaz értéket ad vissza ha sikerült.
+Adds a technology to the monitor for the selected player. Returns true if successful.
 
-*   playerId: A kívánt játékos sorszáma (1-8)
+*   playerId: The number of the desired player (1-8)
     
-*   technologyId: A figyelni kívánt technológia azonosítója. Például a 45-ös azonosítóval a Hit technológia állapotát figyelheted
+*   technologyId: The identifier of the technology you want to monitor. For example, using ID 45, you can monitor the state of the Faith technology.
     
 
 **_void rsTechCheckerSetFor(int player, int technologyId)_**
 
-A figyelőhöz hozzáad egy technológát az összes játékos számára.
+Adds a technology to the monitor for all players.
 
-*   technologyId: A figyelni kívánt technológia azonosítója. Például a 45-ös azonosítóval a Hit technológia állapotát figyelheted
+*   technologyId: The identifier of the technology you want to monitor. For example, using ID 45, you can monitor the state of the Faith technology.
     
 
 **_bool rsTechCheckerRemoveFor(int player, int technologyId)_**
 
-Eltávolítja a figyelőből a technológiát a megadott játékos esetében. Igaz értéket ad vissza ha sikerült.
+Removes the technology from the monitor for the specified player. Returns true if successful.
 
-*   player: A kívánt játékos sorszáma (1-8)
+*   player: The number of the desired player (1-8)
     
-*   technologyId: Az eltávolítandó technológia azonosítója
+*   technologyId: The identifier of the technology to remove
     
 
 **_void rsTechCheckerRemoveAll(int technologyId)_**
 
-Eltávolítja a technológiát a figyelőből. Az összes játékosra érvényes!
+Removes the technology from the monitor. Applies to all players!
 
-*   technologyId: Az eltávolítandó technológia azonosítója
+*   technologyId: The identifier of the technology to remove
     
 
 **_int rsTechCheckerGetFrom(int player, int technologyId)_**
 
-Lekéri a megadott technológia tárolt állapotát a megadott játékos szerint. Egész számot ad vissza, megegyezik a technológia állapot konstansával. ([tech state konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/#17-tech-state)). nem létező technológia esetében RS\_FALSE
+Retrieves the stored state of the specified technology for the specified player. Returns an integer matching the technology state constant. ([tech state constant](https://ugc.aoe2.rocks/general/xs/constants/constants/#17-tech-state)). Returns RS\_FALSE if the technology does not exist.
 
-*   player: A kívánt játékos sorszáma (1-8)
+*   player: The number of the desired player (1-8)
     
-*   technologyId: A technológia azonosítója aminek az állapotát le szeretnéd kérni
+*   technologyId: The identifier of the technology whose state you want to retrieve
     
 
 **_int rsTechCheckerGetAll(int technologyId)_**
 
-Lekéri a megadott technológia állapotát az összes felhasználótól. Visszatérési értéke egész számokat vagy RS\_FALSE értéket tartalmazó tömb (1-8 darabig terjedő).
+Retrieves the state of the specified technology from all players. The return value is an array containing integers or RS\_FALSE values (ranging from 1 to 8 elements).
 
-*   technologyId: A technológia azonosítója aminek az állapotát le szeretnéd kérni
+*   technologyId: The identifier of the technology whose state you want to retrieve
     
 
-### Esemény funkciók
+### Event Functions
 
 **_void RsEventTechState(string eventName, int playerId, int techId, bool fromQueue)_**
 
-Minden esetben lefut ha technológia állapot változás történik.
+Runs whenever the state of a technology changes.
 
-*   eventName: Az esemén. Lehetséges értékek: notready, ready, queued, inprogress, completed, disabled
+*   eventName: The event. Possible values: notready, ready, queued, inprogress, completed, disabled
     
-*   playerId: A játékos azonosítója akinél változott az állapot
+*   playerId: The identifier of the player whose state changed
     
-*   techId: A technológia azonosítója amelynek megváltozott az állapota
+*   techId: The identifier of the technology whose state changed
     
-*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+*   fromQueue: Whether the previous state was "queued", meaning it was waiting in the queue
     
 
 **_void RsEventTechStateNotReady(int playerId, int techId, bool fromQueue)_**
 
-Akkor fut le ha egy technológia nem kutatható mert egy szükséges technológia hiányzik vagy nem elérhető az adott korban.
+Runs when a technology cannot be researched because a required technology is missing or it is not available in the current Age.
 
-*   playerId: A játékos azonosítója akinél változott az állapot
+*   playerId: The identifier of the player whose state changed
     
-*   techId: A technológia azonosítója amelynek megváltozott az állapota
+*   techId: The identifier of the technology whose state changed
     
-*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+*   fromQueue: Whether the previous state was "queued", meaning it was waiting in the queue
     
 
 **_void RsEventTechStateReady(int playerId, int techId, bool fromQueue)_**
 
-Akkor fut le ha egy technológia kutatható.
+Runs when a technology can be researched.
 
-*   playerId: A játékos azonosítója akinél változott az állapot
+*   playerId: The identifier of the player whose state changed
     
-*   techId: A technológia azonosítója amelynek megváltozott az állapota
+*   techId: The identifier of the technology whose state changed
     
-*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+*   fromQueue: Whether the previous state was "queued", meaning it was waiting in the queue
     
 
 **_void RsEventTechStateQueued(int playerId, int techId, bool fromQueue)_**
 
-Akkor fut le ha egy technológia sorban áll.
+Runs when a technology is queued.
 
-*   playerId: A játékos azonosítója akinél változott az állapot
+*   playerId: The identifier of the player whose state changed
     
-*   techId: A technológia azonosítója amelynek megváltozott az állapota
+*   techId: The identifier of the technology whose state changed
     
-*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban. Jelen esetben mindig igaz
+*   fromQueue: Whether the previous state was "queued", meaning it was waiting in the queue. In this case, it is always true.
     
 
 **_void RsEventTechStateInProgress(int playerId, int techId, bool fromQueue)_**
 
-Akkor fut le ha egy technológia kutatás alatt van.
+Runs when a technology is being researched.
 
-*   playerId: A játékos azonosítója akinél változott az állapot
+*   playerId: The identifier of the player whose state changed
     
-*   techId: A technológia azonosítója amelynek megváltozott az állapota
+*   techId: The identifier of the technology whose state changed
     
-*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+*   fromQueue: Whether the previous state was "queued", meaning it was waiting in the queue
     
 
 **_void RsEventTechStateCompleted(int playerId, int techId, bool fromQueue)_**
 
-Akkor fut le ha egy technológia sikeresen kutatva lett.
+Runs when a technology has been successfully researched.
 
-*   playerId: A játékos azonosítója akinél változott az állapot
+*   playerId: The identifier of the player whose state changed
     
-*   techId: A technológia azonosítója amelynek megváltozott az állapota
+*   techId: The identifier of the technology whose state changed
     
-*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+*   fromQueue: Whether the previous state was "queued", meaning it was waiting in the queue
     
 
 **_void RsEventTechStateDisabled(int playerId, int techId, bool fromQueue)_**
 
-Akkor fut le ha egy technológia le lett tiltva.
+Runs when a technology has been disabled.
 
-*   playerId: A játékos azonosítója akinél változott az állapot
+*   playerId: The identifier of the player whose state changed
     
-*   techId: A technológia azonosítója amelynek megváltozott az állapota
+*   techId: The identifier of the technology whose state changed
     
-*   fromQueue: Ha a korábbi állapot "queued" azaz várakozott a sorban
+*   fromQueue: Whether the previous state was "queued", meaning it was waiting in the queue
     
 
-### Korok szerinti események
+### Age-specific Events
 
 **_void RsFeudalAge(int playerId, int civilization)_**
 
-Akkor fut le ha az adott játékos sikeresen belépett a feudális korba. Ez a függvény csak akkor fut le ha nem a Feudális, Kastély és Birodalmi kortól indult a játék.
+Runs when the specified player successfully advances to the Feudal Age. This function only runs if the game did not start in the Feudal, Castle, or Imperial Age.
 
-*   playerId: A játékos azonosítója
+*   playerId: The identifier of the player
     
-*   civilization: A játékos civilizációjának azonosítója. Megegyezik a [civilizáció konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs) értékeivel.
+*   civilization: The identifier of the player's civilization. Matches the values of the [civilization constants](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs).
     
 
 **_void RsCastleAge(int playerId, int civilization)_**
 
-Akkor fut le ha az adott játékos sikeresen belépett a kastély korba. Ez a függvény csak akkor fut le ha nem a Kastély vagy Birodalmi kortól indult a játék.
+Runs when the specified player successfully advances to the Castle Age. This function only runs if the game did not start in the Castle or Imperial Age.
 
-*   playerId: A játékos azonosítója
+*   playerId: The identifier of the player
     
-*   civilization: A játékos civilizációjának azonosítója. Megegyezik a [civilizáció konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs) értékeivel.
+*   civilization: The identifier of the player's civilization. Matches the values of the [civilization constants](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs).
     
 
 **_void RsImperialAge(int playerId, int civilization)_**
 
-Akkor fut le ha az adott játékos sikeresen belépett a Birodalmi korba. Ez a függvény csak akkor fut le ha nem a Birodalmi kortól indult a játék.
+Runs when the specified player successfully advances to the Imperial Age. This function only runs if the game did not start in the Imperial Age.
 
-*   playerId: A játékos azonosítója
+*   playerId: The identifier of the player
     
-*   civilization: A játékos civilizációjának azonosítója. Megegyezik a [civilizáció konstans](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs) értékeivel.
+*   civilization: The identifier of the player's civilization. Matches the values of the [civilization constants](https://ugc.aoe2.rocks/general/xs/constants/constants/?h=cberber#5-aoe2-civs).
     
 
-# Egyéb funkciók
+# Other Functions
 
-### Üzenetek
+### Messages
 
 **_void rsTechNotification(int playerId, string diplomacy, string message, string soundName)_**
 
-Értesítés küldése a többi játékos számára diplomácia szerint.
+Sends a notification to other players according to diplomacy.
 
-*   playerId (kötelező): A játékos aki küldi az értesítést
+*   playerId (required): The player who sends the notification
     
-*   diplomacy (kötelező): Akik értesítést kapnak. lehetséges értékek: ally, neutral, enemy, any
+*   diplomacy (required): The players who will receive the notification. Possible values: ally, neutral, enemy, any
     
-*   message (kötelező): Az elküldeni kívánt szöveg
+*   message (required): The text to send
     
-*   soundName (opcionális): Egyedi értesítési hang
+*   soundName (optional): Custom notification sound
     
 
 **_void rsChat(int targetPlayerId, string message, string sound)_**
 
-Chat üzenet küldése a megadott játékosnak.
+Sends a chat message to the specified player.
 
-*   targetPlayerId (kötelező): A játékos akinek el lesz küldve az üzenet
+*   targetPlayerId (required): The player to whom the message will be sent
     
-*   message (kötelező): Az üzenet szövege
+*   message (required): The text of the message
     
-*   sound (opcionális): Egyedi értesítési hang
+*   sound (optional): Custom notification sound
     
 
-### Egységek
+### Units
 
 **_void rsKillUnits(int playerId, int unitOrClassId, int unitList, bool except)_**
 
-Megöli a megadott egységeket a térképen.
+Kills the specified units on the map.
 
-*   playerId (kötelező): A játékos azonosítója akinek az egységeit meg kell ölni
+*   playerId (required): The identifier of the player whose units should be killed
     
-*   unitOrClassId (kötelező): Egység vagy osztály azonosító
+*   unitOrClassId (required): Unit or class identifier
     
-*   unitList (opcionális): Egségek azonosítója tömbben megadva akik meghalnak vagy életben maradnak. Csak akkor működik ha az unitOrClassId paraméter osztályazonosítót tartalmaz
+*   unitList (optional): The identifiers of units provided in an array that will either die or remain alive. This only works if the unitOrClassId parameter contains a class identifier
     
-*   except (opcionális): Ha igaz, a tömbben megadott egységeket nem öli meg
+*   except (optional): If true, the units specified in the array will not be killed
     
 
 **_void rsInstantWorker(int playerId, string type, bool instant)_**
 
-Beállítható hogy a falusiaknak szükséges-e az erőforrást leadniuk! Úgy működik mint a Khmer bónusz.
+Configures whether villagers need to drop off their resources! It works like the Khmer bonus.
 
-*   playerId (kötelező): A játékos azonosítója akinél aktiválódik
+*   playerId (required): The identifier of the player for whom it is activated
     
-*   type (kötelező): Azon munkáscsoport akiknek nem kell leadni az erőforrást. Lehetséges értékek: hunter, gold miner, stone miner, miner (arany és kőbányászok), shepherd, fisher, pearlel, forager, hunter, lumber
+*   type (required): The worker group that does not need to drop off resources. Possible values: hunter, gold miner, stone miner, miner (gold and stone miners), shepherd, fisher, pearlel, forager, hunter, lumber
     
-*   instant (opcionális): Ki és be lehet kapcsolni az effektet
+*   instant (optional): Enables or disables the effect
     
 
 **_void rsSetUnitName(int playerId, int unitId, string name)_**
 
-A térképen található egységet lehet átnevezni.
+Renames a unit located on the map.
 
-*   playerId (kötelező): Játékos akinek az egsysége át lesz nevezve
+*   playerId (required): The player whose unit will be renamed
     
-*   unitId (kötelező): Az egység azonosítója
+*   unitId (required): The identifier of the unit
     
-*   name (kötelező): Az egység új neve
+*   name (required): The new name of the unit
     
 
 **_void rsSetUnitHitpoints(int playerId, int unitId, float hp)_**
 
-A térképen található egység életerejét lehet megváltoztatni
+Changes the hit points of a unit located on the map.
 
-*   playerId (kötelező): Játékos akinek az egsysége át lesz nevezve
+*   playerId (required): The player whose unit will be renamed
     
-*   unitId (kötelező): Az egység azonosítója
+*   unitId (required): The identifier of the unit
     
-*   hp (kötelező): Az egység új életereje
+*   hp (required): The new hit points of the unit
     
 
 **_void rsSpawnUnit(int playerId, int spawnUnitId, int targetUnit, int count, int spawnCap)_**
 
-Egységeket lehet létrehozni a megadott épülettípusnál. Úgy működik mint a Szicíliai "First Crusade" technológia.
+Creates units at the specified building type. It works like the Sicilian "First Crusade" technology.
 
-*   playerId (kötelező): Játékos akinek létrejönnek az egységek
+*   playerId (required): The player for whom the units will be created
     
-*   spawnUnitId (kötelező): A létrehozandó egyég azonosítója
+*   spawnUnitId (required): The identifier of the unit to create
     
-*   targetUnitId (kötelező): Épülettípus ahol létrejönnke az egységek
+*   targetUnitId (required): The building type where the units will be created
     
-*   count (kötelező): Hány darab egység jöjjön létre
+*   count (required): The number of units to create
     
-*   spawnCap (kötelező): Maximum hány darab épület mellett jöjjenek létre az egységek
+*   spawnCap (required): The maximum number of buildings at which units should be created
     
 
 **_void rsUnitAttackable(int playerId, int unitOrClass, bool attackable, bool targetable)_**
 
-Beállítható hogy a megadott egység vagy egységosztályba tartozó egységek támadhatóak illetve célozhatóak legyenek-e
+Configures whether the specified unit or units belonging to the specified unit class can be attacked and targeted.
 
-*   playerId (kötelező): Játékos azonosítója akinél alkalmazandó
+*   playerId (required): The identifier of the player to whom this should be applied
     
-*   unitOrClassId (kötelező): Egység vagy osztály azonosító
+*   unitOrClassId (required): Unit or class identifier
     
-*   attackable (kötelező): Támadható-e az egység vagy nem (igaz/Hamis érték)
+*   attackable (required): Whether the unit can be attacked or not (true/false value)
     
-*   targetable (opcionális): célozható vagy sem (igaz/hamis érték)
+*   targetable (optional): Whether the unit can be targeted or not (true/false value)
     
 
-### Logikai érték
+### Boolean Value
 
-Mivel nem létezik "any" érték, így szükséges kifejezetten egész számok esetében létrehozni logikai értéket.
+Because there is no "any" type, a Boolean value specifically for integers is required.
 
 **_int RS\_FALSE_**
 
-A "false" érték egész számmal reprezentálva. Értéke: -9999999
+The "false" value represented as an integer. Value: -9999999
 
 **_int RS\_TRUE_**
 
-A "true" érték egész számmal reprezentálva. Értéke: 9999999
+The "true" value represented as an integer. Value: 9999999
+````

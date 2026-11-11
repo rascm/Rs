@@ -43,7 +43,7 @@ void RsReady() {
     
 }
 
-// This function also runs once per player when everything is ready
+// Or use this: This function also runs once per player when everything is ready. This is where civilization-specific codes can be placed. For example, a unique tech tree
 RsPlayer(int playerId = -1, int civilization = -1, string currentAge = "") {
     xsChatData("Player " + playerId + " start in the " + currentAge + " Age");
     // playerId = the current player number (1-8)

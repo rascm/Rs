@@ -31,7 +31,7 @@ The cost of the specified technology cannot be overwritten! Perhaps this bug wil
 Currently, it is not possible to create a function or variable that can hold any type of value. Unfortunately, there is no such type as "any". Furthermore, it is not possible to specify an "unlimited" number of optional parameters, nor is there a dedicated "arguments" variable within functions or so-called "spread syntax" like in JavaScript.
 
 # Sample main.xs file
-
+You need only the "Rs.xs" file.
 ```c
 include "Rs.xs";
 

@@ -30,6 +30,42 @@ The cost of the specified technology cannot be overwritten! Perhaps this bug wil
 
 Currently, it is not possible to create a function or variable that can hold any type of value. Unfortunately, there is no such type as "any". Furthermore, it is not possible to specify an "unlimited" number of optional parameters, nor is there a dedicated "arguments" variable within functions or so-called "spread syntax" like in JavaScript.
 
+# Sample main.xs file
+
+```
+include "Rs.xs"
+
+// This code runs once when everything is ready. It works just like the main() function
+void RsReady() {
+    xsChatData("Script is ready");
+    // Add Faith Technology to Technology Checker for all players
+    rsTechCheckerSetAll(45);
+    
+}
+
+// This function also runs once per player when everything is ready
+RsPlayer(int playerId = -1, int civilization = -1, string currentAge = "") {
+    xsChatData("Player " + playerId + " start in the " + currentAge + " Age");
+    // playerId = the current player number (1-8)
+    // civilization = returns the civilization ID
+    // currentAge = returns the starting age: "Dark", "Feudal", "Castle", "Imperial" or "Post-Imperial"
+
+    if(currentAge == "Post-Imperial") {
+        // Execute when player is in Post-Imperial Age
+    }
+
+    if(civilization == cMagyars) {
+        // Execute when player civilization are Hungarian
+    }
+}
+
+void RsEventTechState(string eventName = "", int playerId = -1, int techId = -1, bool fromQueue = false) {
+    if(eventName == "done" && techId == 45 && playerId == 1) {
+        // executes when player 1 are researched Faith technology
+    }
+}
+```
+
 # Built-in APIs
 
 ## Timer API
@@ -98,7 +134,7 @@ Adds a technology to the monitor for the selected player. Returns true if succes
 *   technologyId: The identifier of the technology you want to monitor. For example, using ID 45, you can monitor the state of the Faith technology.
     
 
-**_void rsTechCheckerSetFor(int player, int technologyId)_**
+**_void rsTechCheckerSetAll(int technologyId)_**
 
 Adds a technology to the monitor for all players.
 

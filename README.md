@@ -33,7 +33,7 @@ Currently, it is not possible to create a function or variable that can hold any
 # Sample main.xs file
 
 ```c
-include "Rs.xs"
+include "Rs.xs";
 
 // This code runs once when everything is ready. It works just like the main() function
 void RsReady() {
